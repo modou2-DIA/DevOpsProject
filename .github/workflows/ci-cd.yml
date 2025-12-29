@@ -62,7 +62,7 @@ jobs:
     - name: Security scan with Trivy
       uses: aquasecurity/trivy-action@0.24.0
       with:
-        image-ref: ${{ secrets.DOCKER_USERNAME }}/devops-api:test
+        image-ref: devops-api:test
         format: table
         exit-code: '1' # Stoppe le pipeline si des vulnérabilités sont trouvées
         severity: CRITICAL,HIGH
