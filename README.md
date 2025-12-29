@@ -1,5 +1,6 @@
 
-```markdown
+
+````markdown
 # DevSecOps Backend Project – End-to-End Implementation
 
 ## 📌 Overview
@@ -17,84 +18,85 @@ This repository is intended to showcase **real-world DevOps skills** to technica
 - **Backend**: Python (Flask)
 - **CI/CD**: GitHub Actions
 - **Containerization**: Docker (multi-stage, non-root)
-- **Security**: SAST + DAST + Image Scanning
+- **Security**: SAST, DAST, Container Image Scanning
 - **Observability**: Structured logs, request tracing
 - **Orchestration**: Kubernetes (Minikube)
-- **Registry**: Docker Hub
+- **Container Registry**: Docker Hub
 
 ---
 
 ## 🚀 Backend Service
 
-- Lightweight REST API (<150 lines)
-- Health endpoint: `/health`
-- Designed for containerized environments
-- Stateless & production-ready
+- Lightweight REST API (**< 150 lines of code**)
+- Health check endpoint: `/health`
+- Stateless and container-friendly
+- Designed for Kubernetes readiness and scalability
 
 ---
 
 ## 🔁 CI/CD Pipeline (GitHub Actions)
 
-The CI/CD pipeline automates **quality checks, security scans, container build and publication**.
+The CI/CD pipeline automates **code quality checks, security scans, containerization, and publication**.
 
 ### Pipeline Stages
 
-### 1️⃣ Code Quality & Tests
-- `flake8` for linting
+#### 1️⃣ Code Quality & Testing
+- `flake8` for linting and code consistency
 - `pytest` for unit testing
 
-### 2️⃣ Static Application Security Testing (SAST)
-- **Bandit**: detects insecure Python patterns
-- **Safety**: detects vulnerable dependencies (CVEs)
-- Reports generated in JSON and uploaded as artifacts
+#### 2️⃣ Static Application Security Testing (SAST)
+- **Bandit**: detects insecure Python code patterns
+- **Safety**: scans dependencies for known CVEs
+- Reports generated in JSON format and uploaded as CI artifacts
 
-### 3️⃣ Container Build & Image Scanning
-- Docker image built locally using Buildx
+#### 3️⃣ Container Build & Image Security Scan
+- Docker image built locally using Docker Buildx
 - **Trivy** scans the image for CRITICAL and HIGH vulnerabilities
-- Pipeline fails on critical findings
+- Pipeline fails if critical vulnerabilities are detected
 
-### 4️⃣ Dynamic Application Security Testing (DAST)
-- Application started inside Docker
+#### 4️⃣ Dynamic Application Security Testing (DAST)
+- Application started in a Docker container
 - **OWASP ZAP (baseline scan)** executed against the running API
-- HTML report generated and stored as artifact
+- HTML security report generated and stored as artifact
 
-### 5️⃣ Image Publication
-- Image pushed to Docker Hub **only if all checks pass**
-- Tags:
+#### 5️⃣ Image Publication
+- Docker image pushed **only if all previous steps succeed**
+- Image tags:
   - `latest`
-  - commit SHA (traceability)
+  - Commit SHA (for traceability)
 
-📦 Docker image:
-```
-
+📦 Docker image available on Docker Hub:
+```bash
 docker pull diamodou1968/devops-api:latest
-
 ````
 
 ---
 
 ## 🔐 Security Practices Implemented
 
-- SAST (Bandit, Safety)
-- DAST (OWASP ZAP)
-- Container vulnerability scanning (Trivy)
-- Non-root Docker container
-- No secrets hardcoded
-- Minimal base images
+* Static code analysis (Bandit)
+* Dependency vulnerability scanning (Safety)
+* Container image scanning (Trivy)
+* Dynamic runtime security testing (OWASP ZAP)
+* Non-root Docker containers
+* No hardcoded secrets
+* Minimal and hardened base images
 
-Security reports are available as CI artifacts.
+📁 All security reports are available as CI/CD artifacts.
 
 ---
 
 ## 📊 Observability
 
 ### Logs
-- Structured JSON logs
-- Log levels (INFO, ERROR)
-- Timestamped entries
-- Request context included
 
-Example:
+* Structured **JSON logs**
+* Standard log levels (INFO, ERROR)
+* Timestamped entries
+* Request context included (method, path, status, duration)
+
+Example log entry:
+
 ```json
 {
   "timestamp": "2025-12-29T22:18:43Z",
@@ -105,18 +107,18 @@ Example:
   "status_code": 200,
   "duration_ms": 0.35
 }
-````
+```
 
 ### Tracing
 
-* Unique Request ID generated per request
-* Propagated through logs
-* Returned in response headers (`X-Request-ID`)
+* Unique **Request ID** generated per request
+* Propagated through the application lifecycle
+* Returned to the client via response header: `X-Request-ID`
 
 ### Metrics
 
 * Health endpoint implemented
-* Prometheus metrics endpoint planned as next improvement
+* Prometheus `/metrics` endpoint identified as next improvement
 
 ---
 
@@ -124,13 +126,13 @@ Example:
 
 ### Best Practices Applied
 
-* Multi-stage build
-* Slim base image
-* Non-root user
-* Healthcheck
-* Small attack surface
+* Multi-stage builds
+* Slim Python base images
+* Non-root execution
+* Docker healthcheck
+* Reduced attack surface
 
-Build locally:
+### Local Build & Run
 
 ```bash
 docker build -t devops-api .
@@ -143,7 +145,7 @@ docker run -p 8080:8080 devops-api
 
 ### Environment
 
-* Minikube (local cluster)
+* Local Kubernetes cluster using **Minikube**
 
 ### Kubernetes Resources
 
@@ -153,9 +155,9 @@ docker run -p 8080:8080 devops-api
 * ConfigMap
 * Ingress (optional)
 * Liveness & Readiness probes
-* Resource requests & limits
+* CPU & memory requests/limits
 
-### Commands
+### Deployment Commands
 
 ```bash
 minikube start
@@ -169,33 +171,33 @@ minikube service devops-api-service -n devops-project
 
 ## 📦 Deliverables Checklist
 
-✅ Source code & manifests
-✅ CI/CD pipeline with security scans
-✅ Docker image published
-✅ Application deployed on Kubernetes
-✅ Observability (logs + tracing)
-✅ SAST & DAST evidence
-✅ Recruiter-ready documentation
+* ✅ Source code and Kubernetes manifests
+* ✅ Automated CI/CD pipeline with security scans
+* ✅ Docker image published on Docker Hub
+* ✅ Application deployed on Kubernetes
+* ✅ Observability (logs and tracing)
+* ✅ SAST and DAST evidence
+* ✅ Recruiter-ready documentation
 
 ---
 
 ## 🧠 Lessons Learned
 
-* Security must be automated early in CI/CD
-* Observability is not optional in production systems
+* Security must be integrated early in CI/CD pipelines
+* Observability is mandatory for production-grade systems
 * Kubernetes requires health-aware applications
-* DevOps is about **reliability, not scripts**
-* Failing fast is a feature, not a bug
+* DevOps focuses on **reliability and automation**
+* Fast feedback and failure detection improve system quality
 
 ---
 
 ## 📈 Possible Improvements
 
 * Prometheus `/metrics` endpoint
-* Grafana dashboard
-* Kubernetes-native DAST
-* Cloud deployment (GKE / EKS)
-* Alerting rules
+* Grafana dashboards
+* Kubernetes-native DAST scanning
+* Cloud deployment (GKE, EKS, DigitalOcean)
+* Alerting and incident response workflows
 
 ---
 
@@ -203,10 +205,11 @@ minikube service devops-api-service -n devops-project
 
 **Modou DIA**
 DevOps / Backend / Cloud Engineering Student
-Focused on secure, observable, production-grade systems
+Focused on secure, observable, and production-grade systems
 
 ```
 
 ---
 
 
+```
