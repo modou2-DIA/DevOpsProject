@@ -26,6 +26,7 @@ REQUEST_DURATION = Histogram('http_request_duration_seconds', 'HTTP Request Dura
 items_db = {}
 item_counter = 0
 
+
 # Middleware pour logging et métriques
 @app.before_request
 def before_request():
@@ -38,14 +39,13 @@ def before_request():
         'remote_addr': request.remote_addr
     })
 
+
 @app.after_request
 def after_request(response):
     duration = time.time() - request.start_time
     REQUEST_COUNT.labels(method=request.method, endpoint=request.path, status=response.status_code).inc()
     REQUEST_DURATION.labels(method=request.method, endpoint=request.path).observe(duration)
-    
     response.headers['X-Request-ID'] = request.request_id
-    
     logger.info('Request completed', extra={
         'request_id': request.request_id,
         'method': request.method,
@@ -55,22 +55,27 @@ def after_request(response):
     })
     return response
 
+
 # Routes
+
 
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
     return jsonify({'status': 'healthy', 'service': 'devops-api'}), 200
 
+
 @app.route('/metrics', methods=['GET'])
 def metrics():
     """Prometheus metrics endpoint"""
     return generate_latest(), 200
 
+
 @app.route('/api/items', methods=['GET'])
 def get_items():
     """Get all items"""
     return jsonify({'items': list(items_db.values()), 'count': len(items_db)}), 200
+
 
 @app.route('/api/items/<int:item_id>', methods=['GET'])
 def get_item(item_id):
@@ -81,15 +86,14 @@ def get_item(item_id):
     logger.warning('Item not found', extra={'request_id': request.request_id, 'item_id': item_id})
     return jsonify({'error': 'Item not found'}), 404
 
+
 @app.route('/api/items', methods=['POST'])
 def create_item():
     """Create a new item"""
     global item_counter
-    
     data = request.get_json()
     if not data or 'name' not in data:
         return jsonify({'error': 'Name is required'}), 400
-    
     item_counter += 1
     new_item = {
         'id': item_counter,
@@ -97,10 +101,10 @@ def create_item():
         'description': data.get('description', ''),
         'created_at': time.strftime('%Y-%m-%d %H:%M:%S')
     }
-    
     items_db[item_counter] = new_item
     logger.info('Item created', extra={'request_id': request.request_id, 'item_id': item_counter})
     return jsonify(new_item), 201
+
 
 @app.route('/api/items/<int:item_id>', methods=['PUT'])
 def update_item(item_id):
@@ -108,16 +112,14 @@ def update_item(item_id):
     item = items_db.get(item_id)
     if not item:
         return jsonify({'error': 'Item not found'}), 404
-    
     data = request.get_json()
     if not data:
         return jsonify({'error': 'No data provided'}), 400
-    
     item['name'] = data.get('name', item['name'])
     item['description'] = data.get('description', item['description'])
-    
     logger.info('Item updated', extra={'request_id': request.request_id, 'item_id': item_id})
     return jsonify(item), 200
+
 
 @app.route('/api/items/<int:item_id>', methods=['DELETE'])
 def delete_item(item_id):
@@ -128,14 +130,17 @@ def delete_item(item_id):
         return jsonify({'message': 'Item deleted successfully'}), 200
     return jsonify({'error': 'Item not found'}), 404
 
+
 @app.errorhandler(404)
 def not_found(error):
     return jsonify({'error': 'Endpoint not found'}), 404
+
 
 @app.errorhandler(500)
 def internal_error(error):
     logger.error('Internal server error', extra={'request_id': request.request_id, 'error': str(error)})
     return jsonify({'error': 'Internal server error'}), 500
+
 
 if __name__ == '__main__':
     logger.info('Starting DevOps API server')
