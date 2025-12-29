@@ -47,7 +47,8 @@ jobs:
         docker buildx build \
          --push \
          -t ${{ secrets.DOCKER_USERNAME }}/devops-api:latest \
-         -t ${{ secrets.DOCKER_USERNAME }}/devops-api:${{ github.sha }} .
+         -t ${{ secrets.DOCKER_USERNAME }}/devops-api:${{ github.sha }} \
+         .
 
     - name: Security scan with Trivy
       uses: aquasecurity/trivy-action@0.24.0
