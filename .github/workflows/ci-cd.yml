@@ -58,7 +58,7 @@ jobs:
         context: .
         load: true # Charge l'image dans le démon Docker local pour le scan
         tags: |
-            devops-api:test
+             ${{ secrets.DOCKER_USERNAME }}/devops-api:test
     - name: Security scan with Trivy
       uses: aquasecurity/trivy-action@0.24.0
       with:
@@ -74,5 +74,5 @@ jobs:
         context: .
         push: true
         tags: |
-          devops-api:latest
-          devops-api:${{ github.sha }}
+          ${{ secrets.DOCKER_USERNAME }}/devops-api:latest
+          ${{ secrets.DOCKER_USERNAME }}/devops-api:${{ github.sha }}
