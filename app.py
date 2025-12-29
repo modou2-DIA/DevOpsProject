@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from prometheus_client import Counter, Histogram, generate_latest
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 from pythonjsonlogger import jsonlogger
 import logging
 import time
 import uuid
+from flask import Response
 
 # Configuration du logging structuré
 logHandler = logging.StreamHandler()
@@ -21,6 +22,7 @@ CORS(app)
 # Métriques Prometheus
 REQUEST_COUNT = Counter('http_requests_total', 'Total HTTP Requests', ['method', 'endpoint', 'status'])
 REQUEST_DURATION = Histogram('http_request_duration_seconds', 'HTTP Request Duration', ['method', 'endpoint'])
+
 
 # Base de données en mémoire (simple pour la démo)
 items_db = {}
@@ -68,7 +70,7 @@ def health_check():
 @app.route('/metrics', methods=['GET'])
 def metrics():
     """Prometheus metrics endpoint"""
-    return generate_latest(), 200
+    return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
 
 
 @app.route('/api/items', methods=['GET'])
