@@ -74,5 +74,5 @@ jobs:
         context: .
         push: true
         tags: |
-          ${{ secrets.DOCKER_USERNAME }}/devops-api:latest
-          ${{ secrets.DOCKER_USERNAME }}/devops-api:${{ github.sha }}
+          diamodou1968/devops-api:latest
+          diamodou1968/devops-api:${{ github.sha }}
