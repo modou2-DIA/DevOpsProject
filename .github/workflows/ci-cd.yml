@@ -42,18 +42,27 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     
-    - name: Build and push Docker image
-      run: |
-        docker buildx build \
-         --push \
-         -t ${{ secrets.DOCKER_USERNAME }}/devops-api:latest \
-         -t ${{ secrets.DOCKER_USERNAME }}/devops-api:${{ github.sha }} \
-         .
+    - name: Build Docker image (Local only)
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        load: true # Charge l'image dans le démon Docker local pour le scan
+        tags: ${{ secrets.DOCKER_USERNAME }}/devops-api:test
 
     - name: Security scan with Trivy
       uses: aquasecurity/trivy-action@0.24.0
       with:
-        image-ref: ${{ secrets.DOCKER_USERNAME }}/devops-api:latest
+        image-ref: ${{ secrets.DOCKER_USERNAME }}/devops-api:test
         format: table
-        exit-code: '1'
+        exit-code: '1' # Stoppe le pipeline si des vulnérabilités sont trouvées
         severity: CRITICAL,HIGH
+
+    - name: Push Docker image (Only if scan passed)
+      if: success()
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ secrets.DOCKER_USERNAME }}/devops-api:latest
+          ${{ secrets.DOCKER_USERNAME }}/devops-api:${{ github.sha }}
